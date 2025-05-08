@@ -15,7 +15,7 @@ def plot_loss(loss):
     plt.xlabel("Iteration")
     plt.ylabel("Loss")
 
-def plot_results(Z, gamma, loss, gamma_true=None, title="γ(t) over Z(x,t)", save_dir=None):
+def plot_results(Z, gamma, loss, gamma_true=None, title="γ(t) over Z(x,t)", save_dir=None, filename="result.png"):
     """
     Full plotting pipeline for γ(t) optimization results.
     Optionally saves to disk if `save_dir` is provided.
@@ -40,7 +40,7 @@ def plot_results(Z, gamma, loss, gamma_true=None, title="γ(t) over Z(x,t)", sav
 
     if save_dir is not None:
         os.makedirs(save_dir, exist_ok=True)
-        fig_path = os.path.join(save_dir, "results_plot.png")
+        fig_path = os.path.join(save_dir, filename)
         plt.savefig(fig_path)
         print(f"Plot saved to: {fig_path}")
 

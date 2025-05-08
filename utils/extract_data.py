@@ -51,7 +51,7 @@ torch.save({'X': X, 'y': y}, 'grab_control_regression_data.pt')
 print("Saved data to grab_control_regression_data.pt")
 
 
-def load_entry_and_extract_segments1(file_path, segment_length=5):
+def load_entry_and_extract_segments(file_path, segment_length=5):
     """
     Loads one entry from a .mat file and extracts:
     - dF/F₀ signal
@@ -104,7 +104,7 @@ def load_entry_and_extract_segments1(file_path, segment_length=5):
 
     return dfof_signal, masked_img, segment_tensor
 
-def load_entry_and_extract_segments(file_path, segment_length=5):
+def load_entry_and_extract_segments1(file_path, segment_length=5):
     """
     Loads one entry from a .mat file and extracts:
     - dF/F₀ signal

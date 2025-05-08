@@ -2,25 +2,26 @@ from src.runner import run_optimizer
 from src.visualization import plot_results
 from src.optimizers import rmse, relative_rmse
 from data.synthetic import generate_synthetic_data, generate_realistic_synthetic_data
-from utils.experiment_logger import create_experiment_folder, save_config_summary
+from utils.experiment_logger import create_experiment_folder_synthetic, save_config_summary
 from src.optimizers import rmse, relative_rmse
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 # --- Define Experiment Configuration ---
 config = {
-    "optimizer": "nag_torch",
+    "optimizer": "gd_torch",
     "collapse_method": "mean",
     "lambda": 0.1,
     "eta": 0.1,
     "max_iters": 100,
-    "noise_std": 0.10,
+    "noise_std": 0.50,
     "seed": 94,
     "data_variant": "compare"  # choose: "original", "realistic", "compare"
 }
 
 # --- Setup Experiment Folder ---
-save_dir = create_experiment_folder(config)
+save_dir = create_experiment_folder_synthetic(config)
 save_config_summary(config, save_dir)
 
 # --- Generate & Run Optimization ---
@@ -33,8 +34,12 @@ elif config["data_variant"] == "realistic":
 elif config["data_variant"] == "compare":
     Z1, g1 = generate_synthetic_data(noise_std=config["noise_std"], seed=config["seed"])
     Z2, g2 = generate_realistic_synthetic_data(seed=config["seed"], noise_std=config["noise_std"])
+    start1 = time.time()
     gamma1, loss1 = run_optimizer(Z1, method=config["optimizer"])
+    runtime1 = time.time() - start1
+    start2 = time.time()
     gamma2, loss2 = run_optimizer(Z2, method=config["optimizer"])
+    runtime2 = time.time() - start2
 
     # Compute RMSE
     rmse1 = rmse(gamma1, g1)
@@ -43,8 +48,15 @@ elif config["data_variant"] == "compare":
     rel_rmse2 = relative_rmse(gamma2, g2)
 
     # Plot comparison
-    plot_results(Z1, gamma1, loss1, gamma_true=g1, title="Original Synthetic", save_dir=save_dir)
-    plot_results(Z2, gamma2, loss2, gamma_true=g2, title="Realistic Synthetic", save_dir=save_dir)
+    plot_results(Z1, gamma1, loss1, gamma_true=g1,
+             title="Original Synthetic",
+             save_dir=save_dir,
+             filename="original_result.png")
+
+    plot_results(Z2, gamma2, loss2, gamma_true=g2,
+             title="Realistic Synthetic",
+             save_dir=save_dir,
+             filename="realistic_result.png")
 
     # Save results
     np.save(f"{save_dir}/gamma_original.npy", gamma1)
@@ -58,10 +70,17 @@ elif config["data_variant"] == "compare":
     with open(f"{save_dir}/metrics_compare.txt", "w") as f:
         f.write("[Original Synthetic]\n")
         f.write(f"RMSE: {rmse1:.4f}\n")
-        f.write(f"Relative RMSE: {rel_rmse1:.6f}\n\n")
+        f.write(f"Relative RMSE: {rel_rmse1:.6f}\n")
+        f.write(f"Final Loss: {loss1[-1]:.4f}\n")
+        f.write(f"Smoothness: {np.sum(np.diff(gamma1)**2):.4f}\n")
+        f.write(f"Runtime: {runtime1:.4f} sec\n\n")
+
         f.write("[Realistic Synthetic]\n")
         f.write(f"RMSE: {rmse2:.4f}\n")
         f.write(f"Relative RMSE: {rel_rmse2:.6f}\n")
+        f.write(f"Final Loss: {loss2[-1]:.4f}\n")
+        f.write(f"Smoothness: {np.sum(np.diff(gamma2)**2):.4f}\n")
+        f.write(f"Runtime: {runtime2:.4f} sec\n")
 
     print(f"[Original Synthetic] RMSE: {rmse1:.4f}, Relative RMSE: {rel_rmse1:.6f}")
     print(f"[Realistic Synthetic] RMSE: {rmse2:.4f}, Relative RMSE: {rel_rmse2:.6f}")
@@ -74,7 +93,7 @@ else:
 gamma_est, loss = run_optimizer(Z, method=config["optimizer"])
 rmse_val = rmse(gamma_est, gamma_true)
 rel_rmse_val = relative_rmse(gamma_est, gamma_true)
-0000
+
 print(f"[Post-Hoc] RMSE: {rmse_val:.4f}")
 print(f"[Post-Hoc] Relative RMSE: {rel_rmse_val:.6f}")
 
