@@ -1,0 +1,47 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environment and dependencies
+venv/
+.env
+*.env
+*.yml
+
+# PyTorch and model files
+*.pt
+*.pth
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode settings
+.vscode/
+
+# Output directories
+results/
+*.log
+*.out
+*.tmp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Backup or temp files
+*.bak
+*.swp
+*.swo
+~$*
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Ignore old code/archive
+old_stuff/
